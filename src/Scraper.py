@@ -39,15 +39,18 @@ class Scraper:
                     card = self.format(card)
 
                     decklist[card] = numcopies
-            return decklist
+            return [deckname, decklist]
         else:
-            return False
+            return None
 
-    #Formats a title of a card (list of words) to be lowercase and hyphenated
-    def format(self, title, char='-'):
+    #Formats a title of a card (list of words, or a string) to be lowercase and hyphenated(character can be set)
+    @staticmethod
+    def format(title, char='-'):
+        if type(title) is str:
+            title = title.split()
         title = char.join(title).lower()
         return title
 
 if __name__ == "__main__":
     scraper = Scraper()
-    print(scraper.parse(scraper.url))
+    print(scraper.parse(scraper.url)[1])

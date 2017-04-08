@@ -1,5 +1,6 @@
 import csv
 import os
+import Scraper
 
 def readIn(filename):
     '''
@@ -11,7 +12,7 @@ def readIn(filename):
     f = csv.reader(open(filename, 'r'), delimiter=',')
     place = 0
     for item in f:
-        cardName = item[0]
+        cardName = Scraper.Scraper.format(item[0])
         quantity = item[1]
         if cardName not in collection:
             collection[cardName] = quantity
@@ -21,4 +22,4 @@ def readIn(filename):
 
 if __name__ == "__main__":
     path = os.path.abspath("test.csv").replace("/src", "")
-    cardIdx = readIn(path)
+    cardIdx = print(readIn(path))
