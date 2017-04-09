@@ -1,18 +1,35 @@
 from bs4 import BeautifulSoup
 from urllib import request
+import pickle
 
-class Scraper:
+class deckscraper:
 
     def __init__(self):
-        self.url = "http://sales.starcitygames.com//deckdatabase/displaydeck.php?DeckID=112239"
+        self.url = "http://sales.starcitygames.com//deckdatabase/displaydeck.php?DeckID="
         pass
 
-    #Returns an array of arrays of card names (tokens) from a "seed" integer
-    def scrape(self, seed):
-        pass
+    #Creates a dictionary of dictionaries of tuples (deck title & dictionary of card names : counts.
+    #Returns a reference to a pickle file with the associated data saved.
+    @staticmethod
+    def scrape(seed, url="http://sales.starcitygames.com//deckdatabase/displaydeck.php?DeckID=", quota=100, savefile='Decks.pkl'):
+        decks = {}
+        while len(decks) < quota:
+            deck = deckscraper.parse(url+str(seed))
+            #Have to check if deck was parsed correctly; if not, deck will be None
+            if deck:
+                decks[seed] = deckscraper.parse(url+str(seed))
+                print(decks[seed])
+            seed += 1
+
+        save = open(savefile, 'wb')
+        pickle.dump(decks, save)
+        return save
+
+
 
     #Returns HTML element that contains the deck's data; makes sure HTML is valid for parsing.
-    def checkURL(self, url, agent='Google Chrome'):
+    @staticmethod
+    def checkURL(url, agent='Google Chrome'):
         #Prepare request to prevent 403 errors
         req = request.Request(url)
         req.add_header('User-Agent', agent)
@@ -23,8 +40,9 @@ class Scraper:
         return deck
 
     #Returns a list of touples with card names (tokens) and frequencies from a StarcityGames URL.
-    def parse(self, url):
-        deckHTML = self.checkURL(url)
+    @staticmethod
+    def parse(url):
+        deckHTML = deckscraper.checkURL(url)
         #print(deckHTML.prettify())
         if deckHTML:
             deckname = deckHTML.find("a").get_text()
@@ -36,7 +54,7 @@ class Scraper:
                     card = card.get_text().split()
                     numcopies = card[0]
                     card = card[1:]
-                    card = self.format(card)
+                    card = deckscraper.format(card)
 
                     decklist[card] = numcopies
             return [deckname, decklist]
@@ -52,5 +70,4 @@ class Scraper:
         return title
 
 if __name__ == "__main__":
-    scraper = Scraper()
-    print(scraper.parse(scraper.url)[1])
+    deckscraper.scrape(110241)
