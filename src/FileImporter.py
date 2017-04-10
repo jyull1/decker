@@ -1,6 +1,6 @@
 import csv
 import os
-import Scraper
+from Scraper import deckscraper
 
 def readIn(filename):
     '''
@@ -12,12 +12,14 @@ def readIn(filename):
     f = csv.reader(open(filename, 'r'), delimiter=',')
     place = 0
     for item in f:
-        cardName = Scraper.Scraper.format(item[0])
+        cardName = deckscraper.format(item[0])
         quantity = item[1]
-        if cardName not in collection:
-            collection[cardName] = quantity
-        else:
-            collection[cardName] += quantity
+        #Checks if the quantity read is null
+        if quantity:
+            if cardName not in collection:
+                collection[cardName] = int(quantity)
+            else:
+                collection[cardName] += int(quantity)
     return collection
 
 if __name__ == "__main__":

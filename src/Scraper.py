@@ -13,7 +13,7 @@ class deckscraper:
     @staticmethod
     def scrape(seed, url="http://sales.starcitygames.com//deckdatabase/displaydeck.php?DeckID=", quota=100, savefile='Decks.pkl'):
         decks = {}
-        while len(decks) < quota:
+        while len(decks) < quota and seed < 112595:
             deck = deckscraper.parse(url+str(seed))
             #Have to check if deck was parsed correctly; if not, deck will be None
             if deck:
@@ -55,8 +55,9 @@ class deckscraper:
                     numcopies = card[0]
                     card = card[1:]
                     card = deckscraper.format(card)
+                    if card != '':
+                        decklist[card] = numcopies
 
-                    decklist[card] = numcopies
             return [deckname, decklist]
         else:
             return None
@@ -70,4 +71,4 @@ class deckscraper:
         return title
 
 if __name__ == "__main__":
-    deckscraper.scrape(110241)
+    deckscraper.scrape(55000, quota=100000)

@@ -2,3 +2,4 @@
 *.csv
 src/__pycache__
 Decks.pkl
+myCollection.csv
