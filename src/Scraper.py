@@ -71,4 +71,4 @@ class deckscraper:
         return title
 
 if __name__ == "__main__":
-    deckscraper.scrape(55000, quota=100000)
+    deckscraper.scrape(50000, quota=100)

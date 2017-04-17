@@ -1,5 +1,5 @@
 .idea
 *.csv
 src/__pycache__
-Decks.pkl
+Decks - Backup.pkl
 myCollection.csv
