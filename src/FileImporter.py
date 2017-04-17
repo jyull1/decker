@@ -1,13 +1,42 @@
 import csv
 import os
+from os.path import join, expanduser
 from Scraper import deckscraper
 
+'''
+searches all directories on hard drive for a given file
+:return: full file path to the given file
+'''
+def findFile():
+    foundFiles = []
+    file = input("Name of collection file: ")
+    print('searching...')
+    for root, dirs, files in os.walk(expanduser("~/")):
+        # print(dirs)
+        if file in files:
+            print('found file')
+            path = join(root, file)
+            foundFiles.append(path)
+    if len(foundFiles) == 0:
+        print("No files found.")
+        filepath = findFile()
+    elif len(foundFiles) > 1:
+        print(str(len(foundFiles))+" files found.")
+        for x in range(len(foundFiles)):
+            print(str(x+1)+": "+foundFiles[x])
+        choice = int(input("Choose a file: ")) - 1
+        filepath = foundFiles[choice]
+    else:
+        filepath = foundFiles[0]
+        print("Using "+filepath)
+    return filepath
+
+'''
+reads a csv given csv file and writes contents to a dictionary, accounting for multiple entries of the same card
+:param filename: filepath to a csv file
+:return: collection: dictionary of {cardName:quantity} pairs
+'''
 def readIn(filename):
-    '''
-    reads a csv given csv file and writes contents to a dictionary, accounting for multiple entries of the same card
-    :param filename: filepath to a csv file
-    :return: collection: dictionary of {cardName:quantity} pairs
-    '''
     collection = dict()
     f = csv.reader(open(filename, 'r'), delimiter=',')
     place = 0
@@ -22,6 +51,7 @@ def readIn(filename):
                 collection[cardName] += int(quantity)
     return collection
 
+
 if __name__ == "__main__":
-    path = os.path.abspath("test.csv").replace("/src", "")
-    cardIdx = print(readIn(path))
+    cardIdx = readIn(findFile())
+    print(cardIdx)
