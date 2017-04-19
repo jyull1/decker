@@ -47,20 +47,31 @@ class deckscraper:
         if deckHTML:
             deckname = deckHTML.find("a").get_text()
             decklist = {}
+            sideboard = {}
             deckdivs = deckHTML.find_all("ul")
             for div in deckdivs:
                 cards = div.find_all("li")
-                for card in cards:
-                    card = card.get_text().split()
-                    numcopies = card[0]
-                    card = card[1:]
-                    card = deckscraper.format(card)
-                    if card != '':
-                        decklist[card] = numcopies
+                #Writes to the sideboard dictionary if it is contained in the sideboard div.
+                #Sideboards have less impact on the way the deck plays, so they are stored separately.
+                if deckHTML.find("div", class_="deck_sideboard") in div.parents:
+                    deckscraper.store(cards, sideboard)
+                else:
+                    deckscraper.store(cards, decklist)
 
-            return [deckname, decklist]
+            return [deckname, decklist, sideboard]
         else:
             return None
+
+    #Converts a list of <li> HTML tags into a dictionary of cards to frequency data (i.e. {cardname : x}).
+    @staticmethod
+    def store(cards, dict):
+        for card in cards:
+            card = card.get_text().split()
+            numcopies = card[0]
+            card = card[1:]
+            card = deckscraper.format(card)
+            if card != '':
+                dict[card] = numcopies
 
     #Formats a title of a card (list of words, or a string) to be lowercase and hyphenated(character can be set)
     @staticmethod
@@ -71,4 +82,4 @@ class deckscraper:
         return title
 
 if __name__ == "__main__":
-    deckscraper.scrape(50000, quota=100)
+    deckscraper.scrape(50000, quota=100000, savefile="decks2.pkl")

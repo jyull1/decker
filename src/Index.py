@@ -72,6 +72,5 @@ if __name__ == "__main__":
     # print("Deck 111239:")
     # print(index.deckdata[111239])
     # index.compare(index.deckdata[111239][1])
-    #index.find(quota=200)
-    print(index.idf(index.deckdata))
+    index.find(quota=200)
 
