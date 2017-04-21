@@ -1,6 +1,7 @@
 from Scraper import deckscraper
 import FileImporter
 import pickle
+import operator
 
 class Index:
 
@@ -45,7 +46,6 @@ class Index:
 
         # print(iterations)
 
-
     def compare(self, deck):
         for card in deck:
             if not self.collection.get(card):
@@ -66,11 +66,46 @@ class Index:
 
         return head+list+"________________________________________"
 
+    def subset(self, card):
+        card = deckscraper.format(card)
+        containscard = {}
+        for deck in self.deckdata:
+            if card in self.deckdata[deck][1]:
+                containscard[deck] = self.deckdata[deck]
+
+        return containscard
+
+    #board indicates whether it is in the mainboard or sideboard; 1 is mainboard, 2 is sideboard
+    def rank(self, card, board=1):
+        cardrankings = {}
+        for deck in self.subset(card):
+            for card in self.deckdata[deck][board]:
+                if card in cardrankings:
+                    cardrankings[card] += 1
+                else:
+                    cardrankings[card] = 1
+
+        return cardrankings
+
+    @staticmethod
+    def order(cards):
+        sortedcards = sorted(cards.items(), key=operator.itemgetter(1), reverse=True)
+        return sortedcards
+
+    @staticmethod
+    def formatcards(cardrankings):
+        output = ""
+        for card in Index.order(cardrankings):
+            output += card[0] + "\n\n"
+
+        return output
+
 
 if __name__ == "__main__":
     index = Index(collection='myCollection.csv')
     # print("Deck 111239:")
     # print(index.deckdata[111239])
     # index.compare(index.deckdata[111239][1])
-    index.find(quota=200)
+    #index.find(quota=200)
+    print(Index.formatcards(index.rank("Ajani Steadfast")))
 
