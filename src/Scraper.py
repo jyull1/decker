@@ -18,19 +18,9 @@ class deckscraper:
             deck = deckscraper.parse(url+str(seed))
             #Have to check if deck was parsed correctly; if not, deck will be None
             if deck:
-                db.insertDeck(seed)
-                for card in deck:
-                    db.insertCard(card[0])
-                    newCardID = db.lookupCard(card[0])[0]
-                    deckID = db.lookupDeck_byDeckNumber(seed)[0]
-                    db.insertCardToDeck(newCardID, deckID, card[1])
+                db.insertFromScrape(deck, seed, False)
+                db.insertFromScrape(deck[2], seed, True)
             seed += 1
-        """
-        REPLACED BY DATABASE
-        save = open(savefile, 'wb')
-        pickle.dump(decks, save)
-        return save
-        """
 
     #Returns HTML element that contains the deck's data; makes sure HTML is valid for parsing.
     @staticmethod

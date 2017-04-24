@@ -49,8 +49,11 @@ class db(object):
         deckInfo = self.lookupDeck_byDeckNumber(deckNo)
 
         sql = """INSERT INTO Deck (deckNumber, name, isSideboard, sideboardID) VALUES ('%d','%s',1, -1)""" % (deckNo, deckInfo[1])
-
         res = self.execute(sql)
+
+        sql = """UPDATE Deck SET sideboardID='%d' WHERE deckNumber='%d' AND isSideboard=0""" % (self.lookupSideboardID_byDeckNumber(deckNo)[0], deckNo)
+        res = self.execute(sql)
+
         return self.cursor.lastrowid
 
     def lookupDeck_byID(self, id):
@@ -63,7 +66,18 @@ class db(object):
             return reslist[0]
 
     def lookupDeck_byDeckNumber(self, deckNumber):
-        sql = "SELECT id from Deck WHERE deckNumber='%d'" % (deckNumber)
+        sql = "SELECT id from Deck WHERE deckNumber='%d' AND isSideboard=0" % (deckNumber)
+        res = self.execute(sql)
+        reslist = res.fetchall()
+        if not reslist:
+            return None
+        elif len(reslist > 1):
+            raise RuntimeError('DB: constraint failure on Deck')
+        else:
+            return reslist[0]
+
+    def lookupSideboardID_byDeckNumber(self, deckNumber):
+        sql = """SELECT id from Deck WHERE deckNumber='%d' AND isSideboard=1""" % (deckNumber)
         res = self.execute(sql)
         reslist = res.fetchall()
         if not reslist:
@@ -126,6 +140,17 @@ class db(object):
             raise RuntimeError('DB: constraint failure on CardToDeck')
         else:
             return reslist[0][0]
+
+    def insertFromScrape(self, deck, deckNo, isSideboard):
+        if isSideboard:
+            db.insertSideboard(deckNo)
+        else:
+            db.insertDeck(deckNo)
+        for card in deck:
+            db.insertCard(card[0])
+            newCardID = db.lookupCard(card[0])[0]
+            deckID = db.lookupDeck_byDeckNumber(deckNo)[0]
+            db.insertCardToDeck(newCardID, deckID, card[1])
 
 if __name__ == '__main__':
     db = db('test.db')
