@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 from urllib import request
 import pickle
+from Database import db
 
 class deckscraper:
 
@@ -9,7 +10,7 @@ class deckscraper:
         pass
 
     #Creates a dictionary of dictionaries of tuples (deck title & dictionary of card names : counts.
-    #Returns a reference to a pickle file with the associated data saved.
+    #Uses dictionary to insert cards and deck into database
     @staticmethod
     def scrape(seed, url="http://sales.starcitygames.com//deckdatabase/displaydeck.php?DeckID=", quota=100, savefile='Decks.pkl'):
         decks = {}
@@ -17,15 +18,19 @@ class deckscraper:
             deck = deckscraper.parse(url+str(seed))
             #Have to check if deck was parsed correctly; if not, deck will be None
             if deck:
-                decks[seed] = deckscraper.parse(url+str(seed))
-                print(decks[seed])
+                db.insertDeck(seed)
+                for card in deck:
+                    db.insertCard(card[0])
+                    newCardID = db.lookupCard(card[0])[0]
+                    deckID = db.lookupDeck_byDeckNumber(seed)[0]
+                    db.insertCardToDeck(newCardID, deckID, card[1])
             seed += 1
-
+        """
+        REPLACED BY DATABASE
         save = open(savefile, 'wb')
         pickle.dump(decks, save)
         return save
-
-
+        """
 
     #Returns HTML element that contains the deck's data; makes sure HTML is valid for parsing.
     @staticmethod
