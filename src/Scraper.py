@@ -82,4 +82,4 @@ class deckscraper:
         return title
 
 if __name__ == "__main__":
-    deckscraper.scrape(50000, quota=100000, savefile="decks2.pkl")
+    deckscraper.scrape(50000, quota=10, savefile="decks2.pkl")
