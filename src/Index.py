@@ -76,7 +76,7 @@ class Index:
         return containscard
 
     #board indicates whether it is in the mainboard or sideboard; 1 is mainboard, 2 is sideboard
-    def rank(self, card, board=1):
+    def rank(self, card, board=1, onlycollection=False):
         cardrankings = {}
         for deck in self.subset(card):
             for card in self.deckdata[deck][board]:
@@ -84,6 +84,14 @@ class Index:
                     cardrankings[card] += 1
                 else:
                     cardrankings[card] = 1
+
+            if onlycollection:
+                listdel = []
+                for card in cardrankings:
+                    if card not in self.collection:
+                        listdel.append(card)
+                for card in listdel:
+                    del cardrankings[card]
 
         return cardrankings
 
@@ -95,8 +103,10 @@ class Index:
     @staticmethod
     def formatcards(cardrankings):
         output = ""
+        ranking = 0
         for card in Index.order(cardrankings):
-            output += card[0] + "\n\n"
+            output += str(ranking) + ". " + card[0] + "\n\n"
+            ranking += 1
 
         return output
 
@@ -107,5 +117,5 @@ if __name__ == "__main__":
     # print(index.deckdata[111239])
     # index.compare(index.deckdata[111239][1])
     #index.find(quota=200)
-    print(Index.formatcards(index.rank("Ajani Steadfast")))
+    print(Index.formatcards(index.rank("soul of zendikar", onlycollection=True)))
 
