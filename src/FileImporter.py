@@ -1,8 +1,6 @@
 import csv
 import os
 from os.path import join, expanduser
-from Scraper import deckscraper
-from Database import db
 
 class importer:
     '''

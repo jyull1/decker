@@ -1,5 +1,5 @@
 import sqlite3
-from Scraper import deckscraper
+import cardmanager
 
 class db(object):
     def __init__(self, dbfile):
@@ -92,7 +92,7 @@ class db(object):
         if card_id is not None:
             return card_id
 
-        sql = """INSERT INTO Card (formattedName, name) VALUES ('%s','%s')""" % (deckscraper.format(name), name)
+        sql = """INSERT INTO Card (formattedName, name) VALUES ('%s','%s')""" % (cardmanager.makeslug(name), name)
 
         res = self.execute(sql)
         return self.cursor.lastrowid
@@ -141,7 +141,8 @@ class db(object):
         else:
             return reslist[0][0]
 
-    def insertFromScrape(self, deck, deckNo, isSideboard):
+    @staticmethod
+    def insertFromScrape(deck, deckNo, isSideboard):
         if isSideboard:
             db.insertSideboard(deckNo)
         else:
