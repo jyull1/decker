@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 from urllib import request
 import pickle
+import cardmanager
 
 class deckscraper:
 
@@ -69,17 +70,9 @@ class deckscraper:
             card = card.get_text().split()
             numcopies = card[0]
             card = card[1:]
-            card = deckscraper.format(card)
+            card = cardmanager.makeslug(card)
             if card != '':
                 dict[card] = numcopies
-
-    #Formats a title of a card (list of words, or a string) to be lowercase and hyphenated(character can be set)
-    @staticmethod
-    def format(title, char='-'):
-        if type(title) is str:
-            title = title.split()
-        title = char.join(title).lower()
-        return title
 
 if __name__ == "__main__":
     deckscraper.scrape(50000, quota=10, savefile="decks2.pkl")
