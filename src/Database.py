@@ -13,8 +13,7 @@ class db(object):
                                  id  INTEGER PRIMARY KEY,
                                  deckNumber REAL,
                                  deckName VARCHAR, 
-                                 isSideboard INTEGER,
-                                 sideboardID INTEGER
+                                 isSideboard INTEGER
                             );""")
 
         self.execute("""CREATE TABLE IF NOT EXISTS Card (
@@ -41,19 +40,16 @@ class db(object):
         if duplicate is not None:
             return duplicate
 
-        sql = """INSERT INTO Deck (deckNumber, deckName, isSideboard, sideboardID) VALUES ('%d','%s', 0, -1)""" % (deckNumber, name.replace("/", "-"))
+        sql = """INSERT INTO Deck (deckNumber, deckName, isSideboard) VALUES ('%d','%s', 0)""" % (deckNumber, name.replace("/", "-"))
 
         res = self.execute(sql)
         self.insertSideboard(deckNumber)
         return self.cursor.lastrowid
 
     def insertSideboard(self, deckNo):
-        sql = """UPDATE Deck SET sideboardID='%d' WHERE deckNumber='%d' AND isSideboard=0""" % (deckNo, deckNo-.5)
-        res = self.execute(sql)
-
         deckName = self.lookupDeckName_byDeckNumber(deckNo)[0]
         deckName = deckName.replace("/", "-")+" Sideboard"
-        sql = """INSERT INTO Deck (deckNumber, deckName, isSideboard, sideboardID) VALUES ('%d','%s',1, -1)""" % (deckNo, deckName)
+        sql = """INSERT INTO Deck (deckNumber, deckName, isSideboard) VALUES ('%d','%s',1)""" % (deckNo, deckName)
         res = self.execute(sql)
         return self.cursor.lastrowid
 
