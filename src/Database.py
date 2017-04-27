@@ -156,7 +156,7 @@ class db(object):
 
     def insertFromScrape(self, deck, deckNo):
         self.insertDeck(deckNo, name=deck[0])
-        parts = [deck[1], deck[2]]
+        parts = [deck[3], deck[4]]
         for part in parts:
             for card in part.keys():
                 self.insertCard(card)

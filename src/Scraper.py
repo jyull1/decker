@@ -50,6 +50,8 @@ class deckscraper:
             deckname = deckHTML.find("a").get_text()
             decklist = {}
             sideboard = {}
+            decklistNF = {}
+            sideboardNF = {}
             deckdivs = deckHTML.find_all("ul")
             for div in deckdivs:
                 cards = div.find_all("li")
@@ -57,21 +59,26 @@ class deckscraper:
                 #Sideboards have less impact on the way the deck plays, so they are stored separately.
                 if deckHTML.find("div", class_="deck_sideboard") in div.parents:
                     deckscraper.store(cards, sideboard)
+                    deckscraper.store(cards, sideboardNF, False)
                 else:
                     deckscraper.store(cards, decklist)
+                    deckscraper.store(cards, decklistNF, False)
 
-            return [deckname, decklist, sideboard]
+            return [deckname, decklist, sideboard, decklistNF, sideboardNF]
         else:
             return None
 
     #Converts a list of <li> HTML tags into a dictionary of cards to frequency data (i.e. {cardname : x}).
     @staticmethod
-    def store(cards, dict):
+    def store(cards, dict, formatted=True):
         for card in cards:
             card = card.get_text().split()
             numcopies = card[0]
             card = card[1:]
-            card = cardmanager.makeslug(card)
+            if formatted:
+                card = cardmanager.makeslug(card)
+            else:
+                card = cardmanager.makeslug(card, ' ')
             if card != '':
                 dict[card] = numcopies
 
