@@ -8,20 +8,26 @@ class deckscraper:
 
     def __init__(self):
         self.url = "http://sales.starcitygames.com//deckdatabase/displaydeck.php?DeckID="
+        self.database = db('decks.db')
         pass
 
     #Creates a dictionary of dictionaries of tuples (deck title & dictionary of card names : counts.
     #Uses dictionary to insert cards and deck into database
-    @staticmethod
-    def scrape(seed, url="http://sales.starcitygames.com//deckdatabase/displaydeck.php?DeckID=", quota=100, savefile='Decks.pkl'):
+    def scrape(self, seed, url="http://sales.starcitygames.com//deckdatabase/displaydeck.php?DeckID=", quota=100, savefile='Decks.pkl'):
         decks = {}
         while len(decks) < quota and seed < 112595:
             deck = deckscraper.parse(url+str(seed))
+            print(seed)
             #Have to check if deck was parsed correctly; if not, deck will be None
             if deck:
-                db.insertFromScrape(deck, seed, False)
-                db.insertFromScrape(deck[2], seed, True)
+                decks[seed] = deckscraper.parse(url+str(seed))
+                print(decks[seed])
+                self.database.insertFromScrape(deck, seed)
             seed += 1
+
+        save = open(savefile, 'wb')
+        pickle.dump(decks, save)
+        return save
 
     #Returns HTML element that contains the deck's data; makes sure HTML is valid for parsing.
     @staticmethod
@@ -70,4 +76,5 @@ class deckscraper:
                 dict[card] = numcopies
 
 if __name__ == "__main__":
-    deckscraper.scrape(50000, quota=10, savefile="decks2.pkl")
+    scraper = deckscraper()
+    scraper.scrape(50000, quota=10, savefile="decks2.pkl")
