@@ -1,8 +1,6 @@
 import sqlite3
 import cardmanager
 
-# TODO Card needs name formatted and unformatted
-
 class db(object):
     def __init__(self, dbfile):
         self.dbfile = dbfile
