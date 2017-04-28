@@ -1,4 +1,4 @@
-from Scraper import deckscraper
+import cardmanager
 import FileImporter
 import pickle
 import operator
@@ -67,7 +67,7 @@ class Index:
         return head+list+"________________________________________"
 
     def subset(self, card):
-        card = deckscraper.format(card)
+        card = cardmanager.makeslug(card)
         containscard = {}
         for deck in self.deckdata:
             if card in self.deckdata[deck][1]:

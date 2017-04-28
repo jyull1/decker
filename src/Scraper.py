@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 from urllib import request
 import pickle
 from Database import db
+
 import cardmanager
 
 class deckscraper:
@@ -79,6 +80,7 @@ class deckscraper:
                 card = cardmanager.makeslug(card)
             else:
                 card = cardmanager.makeslug(card, ' ')
+
             if card != '':
                 dict[card] = numcopies
 

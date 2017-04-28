@@ -1,8 +1,6 @@
 import sqlite3
 import cardmanager
 
-# TODO Card needs name formatted and unformatted
-
 class db(object):
     def __init__(self, dbfile):
         self.dbfile = dbfile
@@ -100,8 +98,8 @@ class db(object):
         card_id = self.lookupCard(name)
         if card_id is not None:
             return card_id
-
         sql = """INSERT INTO Card (formattedName, cardName) VALUES ('%s','%s')""" % (cardmanager.makeslug(name), name)
+
 
         res = self.execute(sql)
         return self.cursor.lastrowid
