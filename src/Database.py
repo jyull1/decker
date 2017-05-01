@@ -16,8 +16,8 @@ class db(object):
 
         self.execute("""CREATE TABLE IF NOT EXISTS Card (
                                  id  INTEGER PRIMARY KEY,
-                                 formattedName VARCHAR,
-                                 cardName VARCHAR
+                                 formattedName VARCHAR UNIQUE,
+                                 cardName VARCHAR UNIQUE
                             );""")
 
         self.execute("""CREATE TABLE IF NOT EXISTS CardToDeck (
@@ -99,9 +99,25 @@ class db(object):
         if card_id is not None:
             return card_id
 
-        sql = """INSERT INTO Card (formattedName, cardName) VALUES ('%s','%s')""" % (cardmanager.makeslug(name), name)
+        sql = """INSERT OR IGNORE INTO Card (formattedName, cardName) VALUES ('%s','%s')""" % (cardmanager.makeslug(name), name)
 
         res = self.execute(sql)
+        return self.cursor.lastrowid
+
+    def insertCards(self, names):
+        sql = """INSERT OR IGNORE INTO Card (formattedName, cardName) VALUES """
+        vals = []
+        for name in range(len(names)):
+            names[name] = names[name].replace("'", "")
+            sql += "('%s','%s')"
+            vals.append(cardmanager.makeslug(names[name]))    # FORMATTED NAME
+            vals.append(names[name])
+            if name < len(names)-1:
+                sql += ", "
+        sql += ";"
+        vals = tuple(vals)
+        print(vals)
+        res = self.execute(sql % vals)
         return self.cursor.lastrowid
 
     def lookupCard(self, name):
@@ -152,8 +168,11 @@ class db(object):
         self.insertDeck(deckNo, name=deck[0])
         parts = [deck[3], deck[4]]
         for part in parts:
+            names = []
             for card in part.keys():
-                self.insertCard(card)
+                names.append(card)
+            self.insertCards(names)
+            for card in part.keys():
                 newCardID = self.lookupCard(card)[0]
                 deckID = self.lookupDeck_byDeckNumber(deckNo)[0]
                 self.insertCardToDeck(newCardID, deckID, int(part[card]))
