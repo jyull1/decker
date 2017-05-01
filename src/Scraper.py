@@ -82,4 +82,4 @@ class deckscraper:
 
 if __name__ == "__main__":
     scraper = deckscraper()
-    scraper.scrape(25000, quota=1, savefile="decks2.pkl")
+    scraper.scrape(25000, quota=10, savefile="decks2.pkl")
