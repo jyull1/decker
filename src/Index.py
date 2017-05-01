@@ -1,5 +1,7 @@
 import cardmanager
-import FileImporter
+from CardMatrix import CardMatrix
+from Scraper import deckscraper
+from FileImporter import importer
 import pickle
 import operator
 
@@ -17,7 +19,11 @@ class Index:
             self.deckdata = pickle.load(deckdata)
 
         #Loads personal collection info
-        self.collection = FileImporter.readIn(collection)
+        self.collection = importer().readIn(collection)
+
+        print("Calculating card vectors...")
+        self.matrix = CardMatrix("matrix.pkl")
+        print("Matrix calculated.")
 
     def idf(self, decks):
         inversedf = {}
@@ -67,7 +73,6 @@ class Index:
         return head+list+"________________________________________"
 
     def subset(self, card):
-        card = cardmanager.makeslug(card)
         containscard = {}
         for deck in self.deckdata:
             if card in self.deckdata[deck][1]:
@@ -77,6 +82,7 @@ class Index:
 
     #board indicates whether it is in the mainboard or sideboard; 1 is mainboard, 2 is sideboard
     def rank(self, card, board=1, onlycollection=False):
+        card = cardmanager.format(card)
         cardrankings = {}
         for deck in self.subset(card):
             for card in self.deckdata[deck][board]:
@@ -85,37 +91,66 @@ class Index:
                 else:
                     cardrankings[card] = 1
 
-            if onlycollection:
-                listdel = []
-                for card in cardrankings:
-                    if card not in self.collection:
-                        listdel.append(card)
-                for card in listdel:
-                    del cardrankings[card]
+        if onlycollection:
+            listdel = []
+            for card in cardrankings:
+                if card not in self.collection:
+                    listdel.append(card)
+            for card in listdel:
+                del cardrankings[card]
 
         return cardrankings
+
+    def rank2(self, searchcard, board=1, onlycollection=False):
+        searchcard = cardmanager.format(searchcard)
+        cardrankings = {}
+        for deck in self.deckdata:
+            for card in self.deckdata[deck][board]:
+                if card not in cardrankings:
+                    cardrankings[card] = self.matrix.cosine(searchcard, card)
+
+        if onlycollection:
+            listdel = []
+            for card in cardrankings:
+                if card not in self.collection:
+                    listdel.append(card)
+            for card in listdel:
+                del cardrankings[card]
+
+        return cardrankings
+
 
     @staticmethod
     def order(cards):
         sortedcards = sorted(cards.items(), key=operator.itemgetter(1), reverse=True)
         return sortedcards
 
+    #Takes dictionary of 7 dictionaries (one for each card type) and prints a formatted string
     @staticmethod
-    def formatcards(cardrankings):
+    def formatcards(cardrankings, splittype=True):
         output = ""
-        ranking = 0
-        for card in Index.order(cardrankings):
-            output += str(ranking) + ". " + card[0] + "\n\n"
-            ranking += 1
+        #Chooses 200 most "relevant' cards
+        cardrankings = dict(Index.order(cardrankings)[0:201])
+        if splittype:
+            cardrankings = cardmanager.typesplit(cardrankings)
+            types = ["Creature", "Enchantment", "Artifact", "Planeswalker", "Instant", "Sorcery", "Land"]
+            for type in types:
+                ranking = 1
+                output += type + ":\n###############################################\n"
+                for card in Index.order(cardrankings[type]):
+                    output += str(ranking) + ". " + card[0] + "\n\n"
+                    ranking += 1
+
+        else:
+            ranking = 1
+            for card in Index.order(cardrankings):
+                output += str(ranking) + ". " + card[0] + "\n\n"
+                ranking += 1
 
         return output
 
 
 if __name__ == "__main__":
     index = Index(collection='myCollection.csv')
-    # print("Deck 111239:")
-    # print(index.deckdata[111239])
-    # index.compare(index.deckdata[111239][1])
-    #index.find(quota=200)
-    print(Index.formatcards(index.rank("soul of zendikar", onlycollection=True)))
+    print(Index.formatcards(index.rank2("Ajani Steadfast", onlycollection=True), splittype=True))
 

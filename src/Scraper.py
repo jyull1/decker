@@ -1,29 +1,29 @@
 from bs4 import BeautifulSoup
 from urllib import request
 import pickle
-from Database import db
+#from Database import db
 
 import cardmanager
 
 class deckscraper:
 
-    def __init__(self):
+    def __init__(self, data='C:/Users/Joseph/Desktop/decks.db'):
         self.url = "http://sales.starcitygames.com//deckdatabase/displaydeck.php?DeckID="
-        self.database = db('decks.db')
+        #self.database = db(data)
         pass
 
     #Creates a dictionary of dictionaries of tuples (deck title & dictionary of card names : counts.
     #Uses dictionary to insert cards and deck into database
-    def scrape(self, seed, url="http://sales.starcitygames.com//deckdatabase/displaydeck.php?DeckID=", quota=100, savefile='Decks.pkl'):
+    @staticmethod
+    def scrape(seed, url="http://sales.starcitygames.com//deckdatabase/displaydeck.php?DeckID=", quota=100, savefile='Decks.pkl'):
         decks = {}
         while len(decks) < quota and seed < 112595:
             deck = deckscraper.parse(url+str(seed))
-            print(seed)
             #Have to check if deck was parsed correctly; if not, deck will be None
             if deck:
                 decks[seed] = deckscraper.parse(url+str(seed))
                 print(decks[seed])
-                self.database.insertFromScrape(deck, seed)
+                #self.database.insertFromScrape(deck, seed)
             seed += 1
 
         save = open(savefile, 'wb')
@@ -46,7 +46,6 @@ class deckscraper:
     @staticmethod
     def parse(url):
         deckHTML = deckscraper.checkURL(url)
-        #print(deckHTML.prettify())
         if deckHTML:
             deckname = deckHTML.find("a").get_text()
             decklist = {}
@@ -65,7 +64,8 @@ class deckscraper:
                     deckscraper.store(cards, decklist)
                     deckscraper.store(cards, decklistNF, False)
 
-            return [deckname, decklist, sideboard, decklistNF, sideboardNF]
+            return [deckname, decklist, sideboard]
+        #, decklistNF, sideboardNF
         else:
             return None
 
@@ -75,15 +75,11 @@ class deckscraper:
         for card in cards:
             card = card.get_text().split()
             numcopies = card[0]
-            card = card[1:]
-            if formatted:
-                card = cardmanager.makeslug(card)
-            else:
-                card = cardmanager.makeslug(card, ' ')
+            card = cardmanager.format(" ".join(card[1:]))
 
             if card != '':
                 dict[card] = numcopies
 
 if __name__ == "__main__":
     scraper = deckscraper()
-    scraper.scrape(50000, quota=10, savefile="decks2.pkl")
+    scraper.scrape(25000, quota=1, savefile="decks2.pkl")
