@@ -86,6 +86,7 @@ class Index:
     def rank(self, card, board=1, onlycollection=False):
         print("Rankings results for " + card)
         card = cardmanager.format(card)
+        #contains card names to card appearances
         cardrankings = {}
         for deck in self.subset(card):
             for card in self.deckdata[deck][board]:

@@ -70,9 +70,5 @@ class CardMatrix:
     def toString(self):
         return str(self.vectors)
 
-
-
-
-
 if __name__ == "__main__":
     pass
