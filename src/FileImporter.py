@@ -1,13 +1,16 @@
 import csv
 import os
 from os.path import join, expanduser
+import cardmanager
 
 class importer:
     '''
     searches all directories on hard drive for a given file
     :return: full file path to the given file
     '''
-    def findFile(self):
+    #This doesn't seem to work. It searches, but finds nothing when I enter myCollection.csv    --Joe
+    @staticmethod
+    def findFile():
         foundFiles = []
         file = input("Name of collection file: ")
         print('searching...')
@@ -41,7 +44,7 @@ class importer:
         f = csv.reader(open(filename, 'r'), delimiter=',')
         place = 0
         for item in f:
-            cardName = item[0]
+            cardName = cardmanager.format(item[0])
             quantity = item[1]
             #Checks if the quantity read is null
             if quantity:
