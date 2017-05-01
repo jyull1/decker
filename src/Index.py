@@ -82,6 +82,7 @@ class Index:
 
     #board indicates whether it is in the mainboard or sideboard; 1 is mainboard, 2 is sideboard
     def rank(self, card, board=1, onlycollection=False):
+        print("Rankings results for " + card)
         card = cardmanager.format(card)
         cardrankings = {}
         for deck in self.subset(card):
@@ -102,6 +103,7 @@ class Index:
         return cardrankings
 
     def rank2(self, searchcard, board=1, onlycollection=False):
+        print("Rankings results for " + searchcard)
         searchcard = cardmanager.format(searchcard)
         cardrankings = {}
         for deck in self.deckdata:
@@ -122,6 +124,7 @@ class Index:
 
     @staticmethod
     def order(cards):
+        print("Sorting results...")
         sortedcards = sorted(cards.items(), key=operator.itemgetter(1), reverse=True)
         return sortedcards
 

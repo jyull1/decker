@@ -34,4 +34,4 @@ def typesplit(cards):
 
 
 if __name__ == "__main__":
-    print(getCard("juzam djinn").name)
+    print(getCard("ajani steadfast").name)
