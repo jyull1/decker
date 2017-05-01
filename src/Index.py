@@ -1,11 +1,13 @@
 from Scraper import deckscraper
-import FileImporter
+from FileImporter import importer
 import pickle
 import operator
+import cardmanager
 
 class Index:
 
     def __init__(self, data='Decks.pkl', collection='myCollection.csv'):
+        imp = importer()
         #Loads deck database info
         try:
             deckdata = open(data, 'rb')
@@ -17,7 +19,7 @@ class Index:
             self.deckdata = pickle.load(deckdata)
 
         #Loads personal collection info
-        self.collection = FileImporter.readIn(collection)
+        self.collection = imp.readIn(imp.findFile())
 
     def idf(self, decks):
         inversedf = {}
@@ -67,7 +69,7 @@ class Index:
         return head+list+"________________________________________"
 
     def subset(self, card):
-        card = deckscraper.format(card)
+        card = cardmanager.makeslug(card)
         containscard = {}
         for deck in self.deckdata:
             if card in self.deckdata[deck][1]:
