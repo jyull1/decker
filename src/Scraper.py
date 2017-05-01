@@ -79,8 +79,7 @@ class deckscraper:
             if formatted:
                 card = cardmanager.makeslug(card)
             else:
-                card = cardmanager.makeslug(card, ' ')
-
+                card = cardmanager.makeslug(card, char=' ')
             if card != '':
                 dict[card] = numcopies
 
