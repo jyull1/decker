@@ -1,14 +1,17 @@
-from bs4 import BeautifulSoup
-from urllib import request
 import pickle
-from Database import db
+from urllib import request
+
+from bs4 import BeautifulSoup
+
 import cardmanager
+#from unused.Database import db
+
 
 class deckscraper:
 
     def __init__(self, data='decks.db'):
         self.url = "http://sales.starcitygames.com//deckdatabase/displaydeck.php?DeckID="
-        self.database = db(data)
+        #self.database = db(data)
         pass
 
     #Creates a dictionary of dictionaries of tuples (deck title & dictionary of card names : counts.
@@ -21,7 +24,7 @@ class deckscraper:
             if deck:
                 decks[seed] = deckscraper.parse(url+str(seed))
                 print(decks[seed])
-                self.database.insertFromScrape(deck, seed)
+                #self.database.insertFromScrape(deck, seed)
             seed += 1
 
         save = open(savefile, 'wb')
@@ -62,8 +65,8 @@ class deckscraper:
                     deckscraper.store(cards, decklist)
                     deckscraper.store(cards, decklistNF, False)
 
-            return [deckname, decklist, sideboard , decklistNF, sideboardNF]
-           #
+            return [deckname, decklist, sideboard]
+           #, decklistNF, sideboardNF
         else:
             return None
 
@@ -80,4 +83,4 @@ class deckscraper:
 
 if __name__ == "__main__":
     scraper = deckscraper()
-    scraper.scrape(25000, quota=10, savefile="decks2.pkl")
+    scraper.scrape(25000, quota=10, savefile="pkl/decks2.pkl")

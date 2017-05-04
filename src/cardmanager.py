@@ -1,7 +1,7 @@
 from mtgsdk import Card
 import pickle
 
-data = open("cards.pkl", 'rb')
+data = open("pkl/cards.pkl", 'rb')
 allcards = pickle.load(data)
 
 #Fetches card metadata by name, returns the latest printing of said card
@@ -22,13 +22,26 @@ def typesplit(cards):
     categories = {}
     types = ["Creature", "Enchantment", "Artifact", "Planeswalker", "Instant", "Sorcery", "Land"]
     for type in types:
-        #Complicated list comprehension here.
-        #Basically it filters out all cards that are not of the chosen type, leaving only the cards of the chosen type to
-        #add to the dictionary.
-        typecard = [card for card in cardnames if getCard(card) and type in getCard(card).type]
         categories[type] = {}
-        for card in typecard:
-            categories[type][card] = cards[card]
+
+    for card in cards:
+        #the card object is pulled down separately in case the card to be fetched has no associated data
+        truecard = getCard(card)
+        if truecard:
+            cardtype = truecard.type
+            for type in types:
+                if type in cardtype:
+                    categories[type].update({card : cards[card]})
+
+    # for type in types:
+    #     #Complicated list comprehension here.
+    #     #Basically it filters out all cards that are not of the chosen type, leaving only the cards of the chosen type to
+    #     #add to the dictionary.
+    #
+    #     typecard = [card for card in cardnames if getCard(card) and type in getCard(card).type]
+    #     categories[type] = {}
+    #     for card in typecard:
+    #         categories[type][card] = cards[card]
 
     return categories
 

@@ -4,6 +4,7 @@ import pickle
 class CardMatrix:
 
     #Computes a matrix (or rather, a dictionary) of vectors for each card
+    #Each vector is an array of co-occurrence between cards with other cards
     def __init__(self, deckdata):
         self.vectors = {}
 
@@ -35,8 +36,7 @@ class CardMatrix:
             savedata = open("matrix.pkl", "wb")
             pickle.dump(self.vectors, savedata)
 
-
-
+    #Finds the Euclidean Distance between two card vectors
     def distance(self, card1, card2):
         cards = set(list(self.vectors[card1].keys()) + list(self.vectors[card2].keys()))
         sum = 0
@@ -48,25 +48,27 @@ class CardMatrix:
 
         return math.sqrt(sum)
 
-    def cosine(self, card1, card2):
+    #Finds the cosine similarity between two card vectors.
+    def cosine(self, card1, card2, idf1=1, idf2=2):
         cards = set(list(self.vectors[card1].keys()) + list(self.vectors[card2].keys()))
         dotproduct = 0
         card1length = 0
         card2length = 0
 
         for card in cards:
-            p = self.vectors[card1].get(card) or 0
-            q = self.vectors[card2].get(card) or 0
+            p = (self.vectors[card1].get(card) or 0)*idf1
+            q = (self.vectors[card2].get(card) or 0)*idf2
 
             dotproduct += p*q
             card1length += p**2
             card2length += p**2
 
         card1length = math.sqrt(card1length)
-        card2length = math.sqrt(card1length)
+        card2length = math.sqrt(card2length)
 
-        return dotproduct/(card1length*card2length)
+        return (dotproduct/(card1length*card2length))
 
+    #Formats a String of the vector collection for each card
     def toString(self):
         return str(self.vectors)
 
