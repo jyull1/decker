@@ -1,5 +1,7 @@
 import sqlite3
-import cardmanager
+
+from unused import cardmanager
+
 
 class db(object):
     def __init__(self, dbfile):
@@ -99,7 +101,8 @@ class db(object):
         if card_id is not None:
             return card_id
 
-        sql = """INSERT OR IGNORE INTO Card (formattedName, cardName) VALUES ('%s','%s')""" % (cardmanager.format(name), name)
+        sql = """INSERT OR IGNORE INTO Card (formattedName, cardName) VALUES ('%s','%s')""" % (
+        cardmanager.format(name), name)
 
         res = self.execute(sql)
         return self.cursor.lastrowid

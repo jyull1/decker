@@ -1,5 +1,4 @@
-import Index
-from FileImporter import importer
+from unused.FileImporter import importer
 
 def welcome():
     print("Hello, and welcome to Decker, the world's best (and only) Magic: the Gathering recommender system!")
